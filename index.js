@@ -16,8 +16,10 @@ const stopButton = document.querySelector(".stop");
 const speed = document.querySelector(".speed");
 const apikey = document.querySelector(".apikey");
 const totalDomain = document.querySelector(".total-domain-number");
+const articleError = document.querySelector(".article-error");
 let numOfErrors = 0;
 let arrayLength = 0;
+let numOfArticleErrors = 0;
 speed.defaultValue = 1000;
 apikey.defaultValue = "68cb653c69f14558bd17f0cf0836e21b";
 
@@ -26,9 +28,12 @@ domains.placeholder = domains.placeholder.replace(/\\n/g, "\n");
 scrapeButton.addEventListener("click", function (e) {
 	arrayLength = 0;
 	numOfErrors = 0;
+	numOfArticleErrors = 0;
 	progressBar.textContent = "0%";
 	progressBar.style.width = "0%";
-	error.textContent = `Total Number of Errors: ${numOfErrors}`;
+	number.textContent = `Total Number of Domains Completed: 0`;
+	error.textContent = `Total Number of Errors: 0`;
+	articleError.textContent = `Total Number of Article Errors: 0`;
 	markedText.classList.remove("marked-text--idle");
 	markedText.classList.remove("marked-text--green");
 	markedText.classList.remove("marked-text--yellow");
@@ -113,6 +118,10 @@ ipcRenderer.on("file:notSaved", function (e) {
 	alert("File could not be saved. Please try saving again.");
 });
 
+ipcRenderer.on("file:empty", function (e) {
+	alert("There is no result to save");
+});
+
 ipcRenderer.on("list:error", function (e) {
 	alert("Domain List is Empty");
 });
@@ -120,6 +129,11 @@ ipcRenderer.on("list:error", function (e) {
 ipcRenderer.on("result:error", function (e) {
 	numOfErrors++;
 	error.textContent = `Total Number of Errors: ${numOfErrors}`;
+});
+
+ipcRenderer.on("result:error-no-article", function (e) {
+	numOfArticleErrors++;
+	articleError.textContent = `Total Number of Article Errors: ${numOfArticleErrors}`;
 });
 
 ipcRenderer.on("scrape:stopped", function (e) {

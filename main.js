@@ -6,6 +6,7 @@ const path = require("path");
 const axios = require("axios");
 const fs = require("fs");
 const builder = require("xmlbuilder");
+const sanitizeHtml = require("sanitize-html");
 
 const { app, BrowserWindow, Menu, ipcMain } = electron;
 
@@ -110,6 +111,11 @@ ipcMain.on("domain:save", function (e, fileName) {
 		return;
 	}
 
+	if (resultsArr.length === 0) {
+		mainWindow.webContents.send("file:empty");
+		return;
+	}
+
 	let xml = builder.create("Posts");
 
 	resultsArr.forEach((cur, index) => {
@@ -181,7 +187,61 @@ function test (i) {
 		}
 	})
 		.then((res) => {
-			const data = res.data[0].article;
+			let data = res.data[0].article;
+			if (typeof data.articleBodyHtml === "undefined") {
+				throw new Error("no-article-found");
+			}
+
+			return data;
+		})
+		.then((data) => {
+			const options = {
+				allowedTags: [
+					"h3",
+					"h4",
+					"h5",
+					"h6",
+					"blockquote",
+					"p",
+					"ul",
+					"ol",
+					"nl",
+					"li",
+					"b",
+					"i",
+					"strong",
+					"em",
+					"strike",
+					"code",
+					"hr",
+					"br",
+					"div",
+					"table",
+					"thead",
+					"caption",
+					"tbody",
+					"tr",
+					"th",
+					"td",
+					"pre",
+					"iframe",
+					"img",
+					"figure",
+					"article",
+					"h2",
+					"h1"
+				],
+				allowedAttributes: {
+					img: [ "src", "alt", "sizes" ]
+				}
+			};
+
+			data.articleBodyHtml = sanitizeHtml(data.articleBodyHtml, options);
+			data.articleBodyRaw = sanitizeHtml(data.articleBodyRaw, options);
+
+			return data;
+		})
+		.then((data) => {
 			const result = {
 				title: data.headline || "",
 				html: data.articleBodyHtml,
@@ -197,12 +257,17 @@ function test (i) {
 			idx++;
 			const numberText = idx;
 			mainWindow.webContents.send("result:number", numberText);
-			// if (idx === domainList.length) {
-			// 	console.log(resultsArr);
-			// }
 		})
 		.catch((e) => {
-			mainWindow.webContents.send("result:error");
+			idx++;
+			const numberText = idx;
+			mainWindow.webContents.send("result:number", numberText);
+			if (e.message === "no-article-found") {
+				mainWindow.webContents.send("result:error-no-article");
+			} else {
+				mainWindow.webContents.send("result:error");
+			}
+			console.log(e);
 		});
 }
 
