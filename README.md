@@ -1,2 +1,2 @@
-# wayback-machine-link-scraper
-Scrapes domain snapshop links from Wayback CDX Server API.
+# electron-article-scraper
+Scrapes articles from the given domains
