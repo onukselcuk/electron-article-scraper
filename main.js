@@ -5,6 +5,7 @@ const url = require("url");
 const path = require("path");
 const axios = require("axios");
 const fs = require("fs");
+const builder = require("xmlbuilder");
 
 const { app, BrowserWindow, Menu, ipcMain } = electron;
 
@@ -109,9 +110,26 @@ ipcMain.on("domain:save", function (e, fileName) {
 		return;
 	}
 
-	arranged = arranged.join("\n");
+	let xml = builder.create("Posts");
 
-	fs.writeFile(fileName, arranged, function (err) {
+	resultsArr.forEach((cur, index) => {
+		xml
+			.ele("Post", { id: index + 1 })
+			.ele("Title", cur.title)
+			.up()
+			.ele("Html", cur.html)
+			.up()
+			.ele("OriginalHtml", cur.originalHtml)
+			.up()
+			.ele("Text", cur.text)
+			.up()
+			.ele("Url", cur.url)
+			.up()
+			.ele("Description", cur.description)
+			.end({ pretty: true });
+	});
+
+	fs.writeFile(fileName, xml, function (err) {
 		if (err) {
 			mainWindow.webContents.send("file:notSaved");
 			return;
@@ -179,9 +197,9 @@ function test (i) {
 			idx++;
 			const numberText = idx;
 			mainWindow.webContents.send("result:number", numberText);
-			if (idx === domainList.length) {
-				console.log(resultsArr);
-			}
+			// if (idx === domainList.length) {
+			// 	console.log(resultsArr);
+			// }
 		})
 		.catch((e) => {
 			mainWindow.webContents.send("result:error");
