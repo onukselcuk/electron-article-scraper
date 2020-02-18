@@ -17,6 +17,7 @@ const speed = document.querySelector(".speed");
 const apikey = document.querySelector(".apikey");
 const totalDomain = document.querySelector(".total-domain-number");
 const articleError = document.querySelector(".article-error");
+const success = document.querySelector(".success");
 let numOfErrors = 0;
 let arrayLength = 0;
 let numOfArticleErrors = 0;
@@ -32,8 +33,9 @@ scrapeButton.addEventListener("click", function (e) {
 	progressBar.textContent = "0%";
 	progressBar.style.width = "0%";
 	number.textContent = `Total Number of Domains Completed: 0`;
-	error.textContent = `Total Number of Errors: 0`;
-	articleError.textContent = `Total Number of Article Errors: 0`;
+	error.textContent = `Server Errors: 0`;
+	articleError.textContent = `Article Errors: 0`;
+	success.textContent = "Successful: 0";
 	markedText.classList.remove("marked-text--idle");
 	markedText.classList.remove("marked-text--green");
 	markedText.classList.remove("marked-text--yellow");
@@ -95,6 +97,7 @@ ipcRenderer.on("result:number", function (e, numberText) {
 	progressBar.textContent = `${ratio}%`;
 	progressBar.style.width = `${ratio}%`;
 	number.textContent = `Total Number of Domains Completed: ${numberText}`;
+	success.textContent = `Successful: ${numberText - numOfErrors - numOfArticleErrors}`;
 	if (ratio === 100) {
 		progressBar.textContent = "Completed";
 		progressBar.classList.remove("progress-bar-animated");
@@ -128,12 +131,12 @@ ipcRenderer.on("list:error", function (e) {
 
 ipcRenderer.on("result:error", function (e) {
 	numOfErrors++;
-	error.textContent = `Total Number of Errors: ${numOfErrors}`;
+	error.textContent = `Server Errors: ${numOfErrors}`;
 });
 
 ipcRenderer.on("result:error-no-article", function (e) {
 	numOfArticleErrors++;
-	articleError.textContent = `Total Number of Article Errors: ${numOfArticleErrors}`;
+	articleError.textContent = `Article Errors: ${numOfArticleErrors}`;
 });
 
 ipcRenderer.on("scrape:stopped", function (e) {

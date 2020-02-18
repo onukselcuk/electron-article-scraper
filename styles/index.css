@@ -14,7 +14,18 @@ body {
 	width: 95%;
 	display: flex;
 	flex-direction: column;
+	margin-top: 1rem;
 }
+
+.stats {
+	display: flex;
+	padding: 1rem 0;
+}
+
+.stats-box:nth-of-type(2) {
+	padding-left: 3rem;
+}
+
 .boxes__button {
 	align-self: center;
 	margin: 0.5rem 0;
@@ -64,9 +75,6 @@ label {
 
 .info {
 	line-height: 1;
-}
-.total-domain-number {
-	margin-top: 1rem;
 }
 
 .progress {
