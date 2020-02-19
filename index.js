@@ -49,7 +49,6 @@ scrapeButton.addEventListener("click", function (e) {
 		apikey: apikey.value,
 		domainLis
 	};
-	console.log(formValues);
 	ipcRenderer.send("domain:send", formValues);
 	progressBar.classList.add("progress-bar-animated");
 });

@@ -242,6 +242,16 @@ function test (i) {
 			return data;
 		})
 		.then((data) => {
+			if (typeof data.headline !== "undefined") {
+				const nTitle = data.headline.split(" ");
+				const arrangedTitle = [];
+				nTitle.forEach((cur) => {
+					const aTitle = `${cur[0].toUpperCase()}${cur.slice(1)}`;
+					arrangedTitle.push(aTitle);
+				});
+				data.headline = arrangedTitle.join(" ");
+			}
+
 			const result = {
 				title: data.headline || "",
 				html: data.articleBodyHtml,
@@ -267,7 +277,6 @@ function test (i) {
 			} else {
 				mainWindow.webContents.send("result:error");
 			}
-			console.log(e);
 		});
 }
 
